@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MATRIZ DE ESTUDO — pesquise, fale, compare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root{
+  --bg:#000; --g:#00ff41; --g2:#00b82e; --g3:#0a3d1a; --g4:#04140a; --txt:#b8ffc9; --warn:#ffb000; --bad:#ff3b6b;
+  --disp:"Orbitron","Trebuchet MS",sans-serif; --mono:"Share Tech Mono","Courier New",monospace;
+  --glow:0 0 8px rgba(0,255,65,.7),0 0 22px rgba(0,255,65,.35);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--txt);font:18px/1.55 var(--mono);min-height:100vh}
+#rain{position:fixed;inset:0;width:100%;height:100%;z-index:0;opacity:.45}
+body::after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0,rgba(0,0,0,.18) 1px,transparent 1px,transparent 3px)}
+main{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:28px 16px 90px}
+h1,h2,.timer,.phase,button,.chip{font-family:var(--disp)}
+h1{font-size:clamp(30px,8vw,56px);line-height:1.05;margin:6px 0 10px;color:var(--g);text-shadow:var(--glow);letter-spacing:.04em;font-weight:800}
+h2{font-size:18px;margin:30px 0 10px;color:var(--g);letter-spacing:.08em;font-weight:500;text-shadow:0 0 8px rgba(0,255,65,.5)}
+h2::before{content:"> ";opacity:.7}
+.sub{color:var(--g2);margin:0 0 24px;max-width:56ch}
+.boot{color:var(--g2);font-size:15px;margin:0 0 6px}
+.boot b{color:var(--g);font-weight:400}
+.card{position:relative;background:rgba(2,16,6,.82);border:1px solid var(--g3);padding:18px;margin:0 0 16px;box-shadow:inset 0 0 24px rgba(0,255,65,.05)}
+.card::before,.card::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--g)}
+.card::before{top:-2px;left:-2px;border-right:0;border-bottom:0}
+.card::after{bottom:-2px;right:-2px;border-left:0;border-top:0}
+label.lbl,.lbl{display:block;font:500 14px var(--disp);letter-spacing:.1em;color:var(--g);margin:0 0 8px}
+input[type=text],textarea{width:100%;font:inherit;color:var(--g);background:#000;border:1px solid var(--g2);padding:12px 14px;caret-color:var(--g);border-radius:0}
+input::placeholder,textarea::placeholder{color:#2c7a43}
+textarea{min-height:120px;resize:vertical}
+input:focus-visible,textarea:focus-visible,button:focus-visible,.file:focus-within,a:focus-visible{outline:2px solid var(--g);outline-offset:2px;box-shadow:var(--glow)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1 1 auto}
+button{cursor:pointer;border:1px solid var(--g);background:var(--g);color:#001a06;padding:13px 20px;font-size:14px;font-weight:800;letter-spacing:.1em;border-radius:0;text-transform:uppercase}
+button:hover:not(:disabled){box-shadow:var(--glow)}
+button.ghost{background:transparent;color:var(--g)}
+button.mic{background:transparent;color:var(--g);border-color:var(--g)}
+button.mic.on{background:var(--bad);border-color:var(--bad);color:#fff;animation:pulse 1.2s infinite}
+button:disabled{opacity:.35;cursor:not-allowed}
+@keyframes pulse{50%{box-shadow:0 0 18px var(--bad)}}
+.file{display:block;border:1px dashed var(--g2);padding:16px;text-align:center;cursor:pointer;color:var(--g2)}
+.file input{position:absolute;opacity:0;width:1px;height:1px}
+.file.on{border-style:solid;color:var(--g);background:var(--g4)}
+.seg{display:flex;gap:8px}
+.seg label{flex:1}
+.seg input{position:absolute;opacity:0}
+.seg span{display:block;text-align:center;padding:11px;border:1px solid var(--g3);font:500 15px var(--disp);cursor:pointer;color:var(--g2)}
+.seg input:checked+span{background:var(--g);color:#001a06;border-color:var(--g);box-shadow:var(--glow)}
+.seg input:focus-visible+span{outline:2px solid var(--g);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+.chip{font-size:12px;font-weight:500;letter-spacing:.06em;padding:5px 11px;border:1px solid var(--g3);background:transparent;color:var(--g2);border-radius:0}
+.chip.sel{background:var(--g);color:#001a06;border-color:var(--g)}
+.chip.ok{border-color:var(--g);color:var(--g);background:var(--g4)}
+.chip.miss{border-color:var(--warn);color:var(--warn)}
+.chip.chk{border-color:var(--bad);color:var(--bad)}
+.hidden{display:none!important}
+.phase{display:inline-block;border:1px solid var(--g);color:var(--g);font-size:13px;letter-spacing:.14em;padding:5px 14px;text-shadow:var(--glow)}
+.topic{font:800 clamp(20px,4.5vw,28px)/1.2 var(--disp);margin:12px 0 0;color:var(--txt);word-break:break-word}
+.timer{font-size:clamp(70px,22vw,150px);line-height:1;font-weight:800;letter-spacing:.02em;margin:10px 0 6px;color:var(--g);text-shadow:var(--glow);font-variant-numeric:tabular-nums}
+.bar{height:8px;background:var(--g3);margin:6px 0 20px}
+.bar i{display:block;height:100%;width:0;background:var(--g);box-shadow:var(--glow);transition:width .5s linear}
+ul.q{padding-left:20px;margin:6px 0}
+ul.q li{margin:5px 0}
+a{color:var(--g)}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.links a{font:500 12px var(--disp);letter-spacing:.08em;text-decoration:none;border:1px solid var(--g3);padding:8px 12px;color:var(--g)}
+.links a:hover{border-color:var(--g);box-shadow:var(--glow)}
+.res p{margin:0 0 12px}
+.res blockquote{margin:0 0 12px;padding:2px 0 2px 14px;border-left:3px solid var(--g)}
+.note{color:var(--g2);font-size:15px}
+.meter{height:22px;border:1px solid var(--g);background:#000;margin:8px 0}
+.meter i{display:block;height:100%;background:repeating-linear-gradient(90deg,var(--g) 0 8px,#00a82b 8px 10px);box-shadow:var(--glow)}
+.big{font:800 clamp(40px,12vw,72px)/1 var(--disp);color:var(--g);text-shadow:var(--glow)}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--g3);border-top-color:var(--g);border-radius:50%;animation:r .8s linear infinite;vertical-align:-3px;margin-right:8px}
+@keyframes r{to{transform:rotate(360deg)}}
+.hist button{display:block;width:100%;text-align:left;background:transparent;color:var(--txt);border:0;border-bottom:1px solid var(--g3);padding:10px 2px;font:inherit;letter-spacing:0;text-transform:none;font-weight:400}
+.interim{color:var(--g2);font-size:15px;min-height:1.5em;margin:6px 0 0}
+@media (prefers-reduced-motion:reduce){.spin,button.mic.on{animation:none}.bar i{transition:none}}
+</style>
+</head>
+<body>
+<canvas id="rain" aria-hidden="true"></canvas>
+<main>
+
+<!-- 1. ENTRADA -->
+<section id="s-start">
+  <p class="boot"><b>&gt;</b> sistema iniciado<span id="blink">_</span></p>
+  <h1>MATRIZ DE ESTUDO</h1>
+  <p class="sub">Escolha um tema ou envie um PDF. Pesquise, explique falando em voz alta e veja o que você cobriu e o que ficou de fora, comparando com a fonte.</p>
+
+  <div class="card">
+    <label class="lbl" for="topic">TEMA</label>
+    <div class="row">
+      <input id="topic" type="text" placeholder="Ex.: economia circular, ansiedade, Guerra Fria" autocomplete="off">
+      <button class="ghost" id="roll" style="flex:0 0 auto">Sortear</button>
+    </div>
+    <div class="chips" id="cats"></div>
+  </div>
+
+  <div class="card">
+    <span class="lbl">OU ENVIE UM PDF</span>
+    <label class="file" id="fileLbl">
+      <input type="file" id="pdf" accept="application/pdf">
+      <span id="fileTxt">Toque para escolher um PDF. Ele é lido no seu navegador e não sai do seu computador.</span>
+    </label>
+  </div>
+
+  <div class="card">
+    <span class="lbl">TEMPO DE PESQUISA</span>
+    <div class="seg">
+      <label><input type="radio" name="min" value="10" checked><span>10 MIN</span></label>
+      <label><input type="radio" name="min" value="12"><span>12 MIN</span></label>
+      <label><input type="radio" name="min" value="15"><span>15 MIN</span></label>
+    </div>
+  </div>
+
+  <button id="go" style="width:100%;font-size:16px;padding:16px" disabled>Iniciar pesquisa</button>
+  <div class="hidden" id="histBox"><h2>PAUTAS SALVAS</h2><div class="hist" id="hist"></div></div>
+</section>
+
+<!-- 2. CRONÔMETRO -->
+<section id="s-timer" class="hidden">
+  <span class="phase" id="phase">PESQUISA</span>
+  <div class="topic" id="tTopic"></div>
+  <div class="timer" id="clock" role="timer">10:00</div>
+  <div class="bar" aria-hidden="true"><i id="prog"></i></div>
+
+  <div class="row" style="margin-bottom:18px">
+    <button class="ghost" id="pause">Pausar</button>
+    <button id="next">Terminei</button>
+  </div>
+
+  <div class="card" id="guide"></div>
+
+  <div class="row" style="margin:0 0 8px;justify-content:space-between">
+    <label class="lbl" for="notes" id="boxLbl" style="margin:0;flex:1 1 auto">ANOTAÇÕES</label>
+    <button class="mic" id="mic" style="flex:0 0 auto">Falar</button>
+  </div>
+  <textarea id="notes" placeholder="Digite ou use o botão Falar para ditar."></textarea>
+  <textarea id="voice" class="hidden" placeholder="Aperte Falar e explique o tema em voz alta. O texto aparece aqui e você pode corrigir."></textarea>
+  <p class="interim" id="interim" aria-live="polite"></p>
+  <p class="note hidden" id="micMsg"></p>
+</section>
+
+<!-- 3. RESULTADO -->
+<section id="s-result" class="hidden">
+  <h1 style="font-size:clamp(24px,6vw,40px)" id="rTitle">RESULTADO</h1>
+  <p class="sub" id="rSub"></p>
+  <div id="rBody" class="res"></div>
+  <div class="row" style="margin-top:22px">
+    <button class="ghost" id="copy">Copiar relatório</button>
+    <button class="ghost" id="save">Salvar pauta</button>
+    <button id="again">Novo tema</button>
+  </div>
+</section>
+
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- chuva Matrix ---------- */
+(function(){
+  const cv = $('#rain'), cx = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const chars = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789'.split('');
+  const fs = 16; let cols, drops;
+  function size(){ cv.width = innerWidth; cv.height = innerHeight; cols = Math.ceil(cv.width/fs); drops = Array.from({length:cols}, () => Math.random()*-50); cx.fillStyle='#000'; cx.fillRect(0,0,cv.width,cv.height); }
+  size(); addEventListener('resize', size);
+  if (reduce) return;
+  setInterval(() => {
+    cx.fillStyle = 'rgba(0,0,0,.08)'; cx.fillRect(0,0,cv.width,cv.height);
+    cx.font = fs+'px monospace';
+    for (let i=0;i<cols;i++){
+      const y = drops[i]*fs;
+      cx.fillStyle = Math.random()>.97 ? '#d8ffe3' : '#00ff41';
+      cx.fillText(chars[Math.floor(Math.random()*chars.length)], i*fs, y);
+      if (y>cv.height && Math.random()>.975) drops[i]=0;
+      drops[i]++;
+    }
+  }, 55);
+})();
+
+const TOPICS = {
+  Tecnologia:["Inteligência artificial","Computação quântica","Cibersegurança","Internet das coisas","Blockchain","Energia solar"],
+  Saúde:["Saúde mental","Sono","Ansiedade","Vacinas","Microbioma intestinal","Sedentarismo"],
+  Sociedade:["Economia circular","Urbanização","Desigualdade social","Educação a distância","Trabalho remoto","Mobilidade urbana"],
+  História:["Revolução Industrial","Guerra Fria","Renascimento","Brasil Colônia","Império Romano","Era Vargas"],
+  Ciência:["Mudanças climáticas","Buracos negros","CRISPR","Biodiversidade","Fusão nuclear","Ciclo da água"],
+  Cultura:["Cinema brasileiro","Arquitetura modernista","Psicologia das cores","Cultura pop","Design sustentável","Moda circular"]
+};
+const S = {topic:'', pdfText:'', pdfName:'', min:10, notes:'', voice:'', phase:'', cat:''};
+let timer = null;
+
+function show(id){ ['s-start','s-timer','s-result'].forEach(x => $('#'+x).classList.toggle('hidden', x!==id)); scrollTo(0,0); }
+
+/* ---------- tela inicial ---------- */
+const catsEl = $('#cats');
+Object.keys(TOPICS).forEach(c => {
+  const b = document.createElement('button');
+  b.className='chip'; b.textContent=c; b.type='button';
+  b.onclick = () => { S.cat = (S.cat===c ? '' : c); [...catsEl.children].forEach(x => x.classList.toggle('sel', x.textContent===S.cat)); };
+  catsEl.appendChild(b);
+});
+$('#roll').onclick = () => {
+  const pool = S.cat ? TOPICS[S.cat] : Object.values(TOPICS).flat();
+  $('#topic').value = pool[Math.floor(Math.random()*pool.length)]; clearPdf(); refresh();
+};
+function refresh(){ $('#go').disabled = !($('#topic').value.trim() || S.pdfText); }
+$('#topic').addEventListener('input', () => { if ($('#topic').value.trim()) clearPdf(); refresh(); });
+function clearPdf(){ S.pdfText=''; S.pdfName=''; $('#fileLbl').classList.remove('on'); $('#fileTxt').textContent='Toque para escolher um PDF. Ele é lido no seu navegador e não sai do seu computador.'; $('#pdf').value=''; }
+
+$('#pdf').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  $('#fileTxt').innerHTML = '<span class="spin"></span>Lendo o PDF…';
+  try {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const doc = await pdfjsLib.getDocument({data: await f.arrayBuffer()}).promise;
+    let out=''; const n = Math.min(doc.numPages, 80);
+    for (let i=1;i<=n;i++){ const c = await (await doc.getPage(i)).getTextContent(); out += c.items.map(t=>t.str).join(' ')+'\n'; }
+    out = out.replace(/[ \t]+/g,' ').trim();
+    if (out.length<200) throw new Error('sem texto');
+    S.pdfText=out; S.pdfName=f.name.replace(/\.pdf$/i,''); $('#topic').value='';
+    $('#fileLbl').classList.add('on');
+    $('#fileTxt').textContent = `${f.name} · ${n} página${n>1?'s':''} lida${n>1?'s':''}`;
+  } catch(err){ clearPdf(); $('#fileTxt').textContent='Não consegui ler texto neste PDF. Se ele for escaneado (imagem), tente outro arquivo ou digite o tema.'; }
+  refresh();
+});
+
+/* ---------- cronômetro ---------- */
+const fmt = s => String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+function beep(){ try{ const a=new (window.AudioContext||window.webkitAudioContext)(); [0,.25,.5].forEach(t=>{const o=a.createOscillator(),g=a.createGain();o.frequency.value=880;g.gain.value=.15;o.connect(g);g.connect(a.destination);o.start(a.currentTime+t);o.stop(a.currentTime+t+.15)}); }catch(e){} }
+function runTimer(seconds, onDone){
+  clearInterval(timer);
+  let end = Date.now()+seconds*1000, paused=false, left=seconds;
+  const tick = () => {
+    if (!paused) left = Math.max(0, Math.round((end-Date.now())/1000));
+    $('#clock').textContent = fmt(left);
+    $('#prog').style.width = (100*(seconds-left)/seconds)+'%';
+    document.title = fmt(left)+' · '+S.phase;
+    if (left<=0){ clearInterval(timer); beep(); onDone(); }
+  };
+  $('#pause').textContent='Pausar';
+  $('#pause').onclick = () => { paused=!paused; if(!paused) end=Date.now()+left*1000; $('#pause').textContent = paused?'Continuar':'Pausar'; };
+  $('#next').onclick = () => { clearInterval(timer); onDone(); };
+  tick(); timer = setInterval(tick, 250);
+}
+const isPdf = () => !!S.pdfText;
+const gl = q => `https://www.google.com/search?q=${encodeURIComponent(q)}`;
+
+function startResearch(){
+  S.topic = isPdf() ? S.pdfName : $('#topic').value.trim();
+  S.min = +document.querySelector('input[name=min]:checked').value;
+  S.phase='PESQUISA';
+  $('#phase').textContent = `PESQUISA · ${S.min} MIN`;
+  $('#tTopic').textContent = S.topic;
+  $('#next').textContent = 'Terminei a pesquisa';
+  $('#notes').value=''; $('#voice').value=''; $('#notes').classList.remove('hidden'); $('#voice').classList.add('hidden');
+  $('#boxLbl').textContent='ANOTAÇÕES'; $('#boxLbl').setAttribute('for','notes');
+  const t = esc(S.topic);
+  $('#guide').innerHTML = isPdf()
+    ? `<span class="lbl">COMO ESTUDAR ESTE PDF</span><ul class="q"><li>Leia títulos, introdução e conclusão primeiro.</li><li>Marque as ideias centrais e os termos que se repetem.</li><li>Anote o problema que o texto trata e as soluções que propõe.</li></ul><p class="note" style="margin:8px 0 0">Abra o PDF em outra aba enquanto o tempo corre.</p>`
+    : `<span class="lbl">PERGUNTAS-GUIA</span><ul class="q"><li>O que é “${t}” em uma frase?</li><li>Por que isso importa hoje? Quem é afetado?</li><li>Quais são os principais problemas e soluções conhecidas?</li><li>Que dados ou exemplos reais posso citar?</li></ul>
+       <div class="links"><a target="_blank" rel="noopener" href="${gl(S.topic)}">Google</a><a target="_blank" rel="noopener" href="https://pt.wikipedia.org/w/index.php?search=${encodeURIComponent(S.topic)}">Wikipédia</a><a target="_blank" rel="noopener" href="https://scholar.google.com/scholar?q=${encodeURIComponent(S.topic)}">Acadêmico</a><a target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${encodeURIComponent(S.topic)}">YouTube</a></div>`;
+  show('s-timer'); prefetch(); runTimer(S.min*60, startExplain);
+}
+function startExplain(){
+  stopMic();
+  S.notes = $('#notes').value;
+  S.phase='EXPLICAÇÃO';
+  $('#phase').textContent='EXPLIQUE · 5 MIN';
+  $('#next').textContent='Terminei de explicar';
+  $('#notes').classList.add('hidden'); $('#voice').classList.remove('hidden');
+  $('#boxLbl').textContent='SUA EXPLICAÇÃO (VOZ → TEXTO)'; $('#boxLbl').setAttribute('for','voice');
+  $('#guide').innerHTML = `<span class="lbl">SUA VEZ</span><ul class="q"><li>Aperte <b>Falar</b> e explique em voz alta, como se ensinasse alguém.</li><li>Comece pela ideia central, depois problemas, depois soluções.</li><li>Ao final, o texto falado é comparado com a fonte.</li></ul>`;
+  runTimer(300, finish);
+}
+
+/* ---------- voz → texto ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec=null, micOn=false;
+function target(){ return S.phase==='EXPLICAÇÃO' ? $('#voice') : $('#notes'); }
+function setMicMsg(t){ $('#micMsg').textContent=t; $('#micMsg').classList.toggle('hidden', !t); }
+function startMic(){
+  if (!SR){ setMicMsg('Este navegador não tem reconhecimento de voz. Use Chrome, Edge ou Safari, ou digite o texto.'); return; }
+  setMicMsg('');
+  rec = new SR(); rec.lang='pt-BR'; rec.continuous=true; rec.interimResults=true;
+  const box = target();
+  rec.onresult = e => {
+    let interim='';
+    for (let i=e.resultIndex;i<e.results.length;i++){
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) box.value += (box.value && !/\s$/.test(box.value) ? ' ' : '') + t.trim();
+      else interim += t;
+    }
+    $('#interim').textContent = interim ? '… '+interim : '';
+  };
+  rec.onerror = e => {
+    if (e.error==='not-allowed'||e.error==='service-not-allowed'){ micOn=false; setMicMsg('Microfone bloqueado. Permita o acesso nas configurações do navegador.'); updMic(); }
+  };
+  rec.onend = () => { if (micOn){ try{ rec.start(); }catch(e){} } };
+  micOn=true; updMic(); try{ rec.start(); }catch(e){}
+}
+function stopMic(){ micOn=false; if (rec){ try{ rec.stop(); }catch(e){} } $('#interim').textContent=''; updMic(); }
+function updMic(){ $('#mic').classList.toggle('on', micOn); $('#mic').textContent = micOn ? 'Parar' : 'Falar'; }
+$('#mic').onclick = () => micOn ? stopMic() : startMic();
+
+/* ---------- fonte de referência ---------- */
+let pending=null;
+function prefetch(){ pending = isPdf() ? Promise.resolve({kind:'pdf', text:S.pdfText}) : wiki(S.topic); }
+async function wiki(q){
+  try{
+    const base='https://pt.wikipedia.org/w/api.php?format=json&origin=*&';
+    const s = await (await fetch(base+'action=query&list=search&srlimit=4&srsearch='+encodeURIComponent(q))).json();
+    const hits = s.query.search;
+    if (!hits.length) return {kind:'web', text:'', hits:[]};
+    const p = await (await fetch(base+'action=query&prop=extracts&explaintext=1&exlimit=1&redirects=1&titles='+encodeURIComponent(hits[0].title))).json();
+    const page = Object.values(p.query.pages)[0];
+    return {kind:'web', text:(page.extract||'').slice(0,12000), hits};
+  }catch(e){ return {kind:'web', text:'', hits:[], error:true}; }
+}
+
+/* ---------- análise de texto ---------- */
+const STOP = new Set('a o as os um uma uns umas de do da dos das em no na nos nas por para com sem sob sobre entre e ou mas que se como mais menos muito muita já não sim ao aos à às é são foi ser era ter tem há seu sua seus suas ele ela eles elas isso isto este esta esses essas também quando onde qual quais pelo pela pelos pelas até após ainda só então porque pois nesse nessa neste nesta desse dessa deste desta aqui você vocês tipo coisa coisas pode podem muito sendo foram sido ficou fica'.split(' '));
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const stem = w => norm(w).slice(0,6);
+function words(s){ return (s.toLowerCase().match(/[a-zà-ú]{4,}/g)||[]).filter(w=>!STOP.has(w)); }
+function sentences(t){ return t.replace(/\s+/g,' ').split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ0-9“"])/).map(s=>s.trim()).filter(s=>s.length>50&&s.length<320&&!/^=+/.test(s)); }
+function analyse(text){
+  const sents = sentences(text), freq={}, label={};
+  sents.forEach(s=>words(s).forEach(w=>{ const k=stem(w); freq[k]=(freq[k]||0)+1; if(!label[k]||w.length<label[k].length) label[k]=w; }));
+  const sc = s => { const w=words(s); return w.length ? w.reduce((a,x)=>a+freq[stem(x)],0)/Math.sqrt(w.length) : 0; };
+  const ranked = sents.map((s,i)=>({s,i,v:sc(s)})).sort((a,b)=>b.v-a.v);
+  const keys = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,15).map(([k])=>({k, w:label[k]}));
+  const solRe=/(solu[çc]|propõe|propos|recomend|estratég|alternativ|medida|deve(m)? |é possível|pode(m)? ser|combat|reduz|melhor|tratamento|prevenç|conclu)/i;
+  return {
+    summary: ranked.slice(0,6).sort((a,b)=>a.i-b.i).map(x=>x.s),
+    top: ranked.slice(0,10),
+    keys, freq, total: sents.length,
+    sols: ranked.filter(x=>solRe.test(x.s)).slice(0,5).sort((a,b)=>a.i-b.i).map(x=>x.s)
+  };
+}
+function compare(ref, speech){
+  const mine = new Set(words(speech).map(stem));
+  const covered = ref.keys.filter(x=>mine.has(x.k)), missed = ref.keys.filter(x=>!mine.has(x.k));
+  const pct = Math.round(100*covered.length/ref.keys.length);
+  const gaps = ref.top.filter(x=>{ const w=[...new Set(words(x.s).map(stem))]; return w.length && w.filter(k=>mine.has(k)).length/w.length < .3; }).slice(0,4).sort((a,b)=>a.i-b.i).map(x=>x.s);
+  const extra = [...new Set(words(speech).filter(w=>w.length>=6 && !(stem(w) in ref.freq)))].slice(0,10);
+  return {covered, missed, pct, gaps, extra, n: speech.trim().split(/\s+/).filter(Boolean).length};
+}
+
+/* ---------- resultado ---------- */
+let lastMd='';
+async function finish(){
+  stopMic();
+  S.voice = $('#voice').value.trim(); S.notes = $('#notes').value || S.notes;
+  document.title='MATRIZ DE ESTUDO';
+  show('s-result'); $('#rTitle').textContent = S.topic;
+  $('#rSub').innerHTML='<span class="spin"></span>Comparando com a fonte…'; $('#rBody').innerHTML='';
+  const data = await pending, web = data.kind==='web';
+  let html='', md=`# ${S.topic}\n\n`;
+  if (!data.text){
+    $('#rSub').textContent='Não consegui carregar conteúdo da internet para este tema.';
+    html = `<div class="card"><p>${data.error?'A conexão com a Wikipédia falhou.':'A Wikipédia não tem um artigo claro sobre este tema.'} Tente um termo mais geral ou siga pelo Google.</p><div class="links"><a target="_blank" rel="noopener" href="${gl(S.topic)}">Pesquisar no Google</a></div></div>`;
+    if (S.voice) html += `<h2>SUA EXPLICAÇÃO</h2><div class="card"><p style="white-space:pre-wrap">${esc(S.voice)}</p></div>`;
+    md += 'Sem conteúdo de referência.\n';
+  } else {
+    const a = analyse(data.text);
+    $('#rSub').textContent = web ? 'Fonte de referência: Wikipédia (pt). O Google não pode ser lido por um site estático, então ele entra como link de verificação.' : `Fonte de referência: seu PDF (${a.total} frases analisadas).`;
+
+    html += `<h2>SUA EXPLICAÇÃO × FONTE</h2><div class="card">`;
+    if (S.voice.split(/\s+/).length < 15){
+      html += `<p>Você falou pouco (menos de 15 palavras), então não dá para comparar. Na próxima, aperte <b>Falar</b> durante a fase de explicação.</p>`;
+      md += '## Comparação\nExplicação curta demais para comparar.\n\n';
+    } else {
+      const c = compare(a, S.voice);
+      const verdict = c.pct>=70 ? 'Cobertura forte.' : c.pct>=40 ? 'Cobertura parcial: há pontos importantes de fora.' : 'Cobertura baixa: revise a fonte e tente de novo.';
+      html += `<div class="big">${c.pct}%</div><div class="meter" role="img" aria-label="${c.pct}% dos termos-chave cobertos"><i style="width:${c.pct}%"></i></div>
+        <p>${verdict} Você usou ${c.covered.length} dos ${a.keys.length} termos mais frequentes da fonte, em ${c.n} palavras faladas.</p>
+        <span class="lbl" style="margin-top:14px">VOCÊ COBRIU</span><div class="chips">${c.covered.map(x=>`<span class="chip ok">${esc(x.w)}</span>`).join('')||'<span class="note">nenhum</span>'}</div>
+        <span class="lbl" style="margin-top:14px">FICOU DE FORA</span><div class="chips">${c.missed.map(x=>`<a class="chip miss" target="_blank" rel="noopener" style="text-decoration:none" href="${gl(S.topic+' '+x.w)}">${esc(x.w)}</a>`).join('')||'<span class="note">nada importante</span>'}</div>`;
+      if (c.gaps.length) html += `<span class="lbl" style="margin-top:14px">IDEIAS DA FONTE QUE VOCÊ NÃO TOCOU</span>${c.gaps.map(s=>`<blockquote>${esc(s)}</blockquote>`).join('')}`;
+      if (c.extra.length) html += `<span class="lbl" style="margin-top:14px">TERMOS SEUS QUE A FONTE NÃO USA (CONFIRA)</span><div class="chips">${c.extra.map(w=>`<a class="chip chk" target="_blank" rel="noopener" style="text-decoration:none" href="${gl(S.topic+' '+w)}">${esc(w)}</a>`).join('')}</div><p class="note">Pode ser vocabulário seu ou erro de reconhecimento de voz. Clique para checar no Google.</p>`;
+      md += `## Comparação\nCobertura: ${c.pct}%\nCobriu: ${c.covered.map(x=>x.w).join(', ')}\nFicou de fora: ${c.missed.map(x=>x.w).join(', ')}\n\n`;
+    }
+    html += `</div>`;
+    if (S.voice) html += `<h2>TEXTO DA SUA VOZ</h2><div class="card"><p style="white-space:pre-wrap;margin:0">${esc(S.voice)}</p></div>`;
+
+    html += `<h2>RESUMO DA FONTE</h2><div class="card">${a.summary.map(s=>`<p>${esc(s)}</p>`).join('')}</div>`;
+    html += `<h2>SOLUÇÕES E CONCLUSÕES</h2>`;
+    html += a.sols.length ? `<div class="card">${a.sols.map(s=>`<blockquote>${esc(s)}</blockquote>`).join('')}</div>` : `<p class="note">Não achei trechos que proponham soluções. Aprofunde pelo Google abaixo.</p>`;
+    md += `## Resumo da fonte\n${a.summary.map(s=>'- '+s).join('\n')}\n\n## Soluções e conclusões\n${a.sols.map(s=>'- '+s).join('\n')||'—'}\n\n`;
+  }
+  if (S.notes.trim()){ html += `<h2>SUAS ANOTAÇÕES</h2><div class="card"><p style="white-space:pre-wrap;margin:0">${esc(S.notes)}</p></div>`; md += `## Anotações\n${S.notes}\n\n`; }
+  html += `<h2>FONTES PARA VERIFICAR</h2><div class="card">`;
+  if (web){
+    const hs = data.hits||[];
+    if (hs.length) html += `<ul class="q">${hs.map(h=>`<li><a target="_blank" rel="noopener" href="https://pt.wikipedia.org/wiki/${encodeURIComponent(h.title.replace(/ /g,'_'))}">${esc(h.title)}</a> <span class="note">· Wikipédia</span></li>`).join('')}</ul>`;
+    md += '## Fontes\n'+hs.map(h=>`- https://pt.wikipedia.org/wiki/${encodeURIComponent(h.title.replace(/ /g,'_'))}`).join('\n')+'\n';
+  } else html += `<p style="margin:0 0 6px">Fonte: o PDF “${esc(S.pdfName)}”.</p>`;
+  html += `<div class="links"><a target="_blank" rel="noopener" href="${gl(S.topic+' soluções')}">Google: soluções</a><a target="_blank" rel="noopener" href="${gl(S.topic)}">Google: tema</a><a target="_blank" rel="noopener" href="https://scholar.google.com/scholar?q=${encodeURIComponent(S.topic)}">Acadêmico</a></div></div>`;
+  $('#rBody').innerHTML = html; lastMd = md;
+}
+
+/* ---------- salvar / copiar ---------- */
+function loadHist(){ try{ return JSON.parse(localStorage.getItem('pautas')||'[]'); }catch(e){ return []; } }
+function renderHist(){
+  const h = loadHist(); $('#histBox').classList.toggle('hidden', !h.length);
+  $('#hist').innerHTML = h.map((p,i)=>`<button data-i="${i}">${esc(p.topic)} <span class="note">· ${esc(p.date)}</span></button>`).join('');
+  $('#hist').querySelectorAll('button').forEach(b => b.onclick = () => { $('#topic').value=h[+b.dataset.i].topic; clearPdf(); refresh(); scrollTo(0,0); });
+}
+$('#save').onclick = () => { try{ const h=loadHist(); h.unshift({topic:S.topic,date:new Date().toLocaleDateString('pt-BR')}); localStorage.setItem('pautas',JSON.stringify(h.slice(0,20))); $('#save').textContent='Salvo'; renderHist(); }catch(e){ $('#save').textContent='Não foi possível salvar'; } };
+$('#copy').onclick = async () => { try{ await navigator.clipboard.writeText(lastMd); $('#copy').textContent='Copiado'; }catch(e){ $('#copy').textContent='Copie manualmente'; } };
+$('#again').onclick = () => { $('#save').textContent='Salvar pauta'; $('#copy').textContent='Copiar relatório'; $('#topic').value=''; clearPdf(); refresh(); show('s-start'); };
+$('#go').onclick = startResearch;
+renderHist();
+</script>
+</body>
+</html>
