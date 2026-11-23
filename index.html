@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MATRIZ DE ESTUDO — pesquise, fale, compare</title>
+<link rel="icon" type="image/png" href="/capivatech-64.png">
+<link rel="apple-touch-icon" href="/capivatech-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -83,11 +85,21 @@ a{color:var(--g)}
 .hist button{display:block;width:100%;text-align:left;background:transparent;color:var(--txt);border:0;border-bottom:1px solid var(--g3);padding:10px 2px;font:inherit;letter-spacing:0;text-transform:none;font-weight:400}
 .interim{color:var(--g2);font-size:15px;min-height:1.5em;margin:6px 0 0}
 @media (prefers-reduced-motion:reduce){.spin,button.mic.on{animation:none}.bar i{transition:none}}
+.capiva{display:flex;align-items:center;margin:0 0 22px}
+.capiva a{display:inline-flex;align-items:center;gap:10px;color:var(--g);text-decoration:none;font:800 16px var(--disp);letter-spacing:.08em;text-shadow:0 0 8px rgba(0,255,65,.5)}
+.capiva img{width:36px;height:36px;border-radius:8px;box-shadow:0 0 12px rgba(0,255,65,.35)}
+.capiva a:hover{text-shadow:var(--glow)}
 </style>
 </head>
 <body>
 <canvas id="rain" aria-hidden="true"></canvas>
 <main>
+<header class="capiva">
+  <a href="https://capivatech.github.io/" title="Voltar para a CapivaTech">
+    <img src="/capivatech-64.png" alt="" width="36" height="36">
+    <span>CapivaTech</span>
+  </a>
+</header>
 
 <!-- 1. ENTRADA -->
 <section id="s-start">
